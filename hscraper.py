@@ -90,6 +90,7 @@ def scrape(url):
 
 def scrape_hotels(city, checkin_date, checkout_date, adults = 2, children = 0, min_price = "min", max_price = "max"):
     url = f"https://www.booking.com/searchresults.html?ss={city}&lang=en-us&sb=1&src_elem=sb&src=index&checkin={checkin_date}&checkout={checkout_date}&group_adults={adults}&no_rooms=1&group_children={children}&nflt=price%3DUSD-{min_price}-{max_price}-1"
+    print(url)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
     }
@@ -99,5 +100,38 @@ def scrape_hotels(city, checkin_date, checkout_date, adults = 2, children = 0, m
     hotel_links = [link['href'] for link in hotels]
     return hotel_links
 
+def format_hotels(hotels):
+    print(hotels)
+    hotel_string = ""
+    for h in range(len(hotels[0])):
+        hotel = hotels[h]
+        rooms = hotel[0]
+        info = hotel[1]
+        facilities = hotel[2]
+        locations = hotel[3]
+        hotel_string += "Hotel info: "
+        for key, value in info.items():
+            hotel_string += key + ": " + str(value) + ", "
+        for i in range(min(len(rooms), 3)):
+            room = rooms[i]
+            hotel_string += "Room: " + room['room'] + ","
+            hotel_string += "Price: " + room['price'] + ". "
+        # for i in range(0, len(facilities)):
+        #     hotel_string += facilities[i] + ", "
+        # for i in range(0, len(locations)):
+        #     hotel_string += locations[i][0] + " " + locations[i][1] + ", "
+        hotel_string += "\n" + hotel[4] + "\n"
+    return hotel_string
 
+    
+        
 
+def find_hotels(city, checkin_date, checkout_date, adults = 2, children = 0, min_price = "min", max_price = "max", num_hotels = 5,):
+    suffix = f"ss={city}&lang=en-us&sb=1&src_elem=sb&src=index&checkin={checkin_date}&checkout={checkout_date}&group_adults={adults}&no_rooms=1&group_children={children}&nflt=price%3DUSD-{min_price}-{max_price}-1"
+    urls = scrape_hotels(city, checkin_date, checkout_date, adults, children, min_price, max_price)
+    hotels = [scrape(urls[i]) for i in range(len(urls)) if i < num_hotels]
+    for hotel, url in zip(hotels, urls):
+        hotel.append(url[:url.find("?")] + "?" + suffix)
+    return format_hotels(hotels)
+
+print(find_hotels("Tokyo", "2024-06-15", "2024-06-17", 2, 0, 600, 1000))

@@ -1,6 +1,30 @@
 import re
 import hscraper
 
+from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain.llms import huggingface_pipeline
+import os
+from langchain_community.llms import HuggingFaceEndpoint
+
+
+# Note that the docstrings here are crucial, as they will be passed along
+# to the model along with the class name.
+class HotelTool(BaseModel):
+    """Finds live hotel availability and prices for a given location and dates. Also filters them by price and number of guests."""
+
+    city: int = Field(..., description="City to search for the hotels")
+    from_date: int = Field(..., description="Date of the first day of stay")
+    to_date: int = Field(..., description="Last date of stay")
+    people: int = Field(..., description="Number of people")
+    max_price: int = Field(..., description="Maximum price")
+
+    def call(self):
+        """Call the hotel scraping tool to find hotels with the given parameters."""
+        hotels = self.scrape_hotels(self.city, self.from_date, self.to_date, self.people, max_price=self.max_price)
+        return hotels
+
+
+
 class DataExtractor:
 
     def __init__(self):
@@ -11,7 +35,7 @@ class DataExtractor:
         # to_index = request.find('to:')
         # max_price_index = request.find('max price:')
         # people_index = request.find('people:')
-        pattern = r"(\w+):([^,]+)"
+        pattern = r"(\w+):[ ]{1}([^,]+)"
 
         # Find all matches
         matches = re.findall(pattern, request)
@@ -47,7 +71,8 @@ def langchain_hotels_wrapper(request):
         hotel_data.append(hotel[1])
     # Format the output for the user
     return {
-        "response": "Available hotels: " + ", ".join([f"{hotel['name']} (Price: {hotel['address']}, Rating: {hotel['rating']})" for hotel in hotel_data])
+        "response": "Available hotels: " + ", ".join([f"{hotel['name']} (address: {hotel['address']}, Rating: {hotel['rating']}, Stars: {hotel['stars']})" for hotel in hotel_data])
     }   
 
-print(langchain_hotels_wrapper("city:Chicago, from:2024-06-15, to:2024-06-29, people:2, max_price:2000"))
+
+#print(langchain_hotels_wrapper("city:Los Angeles, from:2024-06-15, to:2024-06-29, people:2, max_price:2000"))
