@@ -134,4 +134,4 @@ def find_hotels(city, checkin_date, checkout_date, adults = 2, children = 0, min
         hotel.append(url[:url.find("?")] + "?" + suffix)
     return format_hotels(hotels)
 
-print(find_hotels("Tokyo", "2024-06-15", "2024-06-17", 2, 0, 600, 1000))
+#print(find_hotels("Tokyo", "2024-06-15", "2024-06-17", 2, 0, 600, 1000))

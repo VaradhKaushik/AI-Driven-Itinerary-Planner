@@ -1,2 +1,4 @@
 *.gguf
 *.gguf:Zone.Identifier
+tripkey.txt
+key.txt
