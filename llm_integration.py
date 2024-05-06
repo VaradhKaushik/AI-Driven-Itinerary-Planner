@@ -13,10 +13,11 @@ class HotelTool(BaseModel):
     """Finds live hotel availability and prices for a given location and dates. Also filters them by price and number of guests."""
 
     city: int = Field(..., description="City to search for the hotels")
-    from_date: int = Field(..., description="Date of the first day of stay")
-    to_date: int = Field(..., description="Last date of stay")
+    from_date: int = Field(..., description="Date of the first day of stay, yyyy-mm-dd format")
+    to_date: int = Field(..., description="Last date of stay, yyyy-mm-dd format")
     people: int = Field(..., description="Number of people")
-    max_price: int = Field(..., description="Maximum price")
+    min_price: int = Field(..., description="Minimum budget for the stay in us dollars, min if not specified")
+    max_price: int = Field(..., description="Maximum price for the stay in us dollars, max if not specified")
 
     def call(self):
         """Call the hotel scraping tool to find hotels with the given parameters."""
